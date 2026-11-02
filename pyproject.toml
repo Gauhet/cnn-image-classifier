@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cnn-image-classifier"
+version = "0.1.0"
+description = "A convolutional neural network trained from scratch on CIFAR-10 with PyTorch."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Gauhet Poddar" }]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.2",
+    "torchvision>=0.17",
+    "matplotlib",
+    "numpy",
+    "Pillow",
+    "pyarrow",
+    "scikit-learn",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
