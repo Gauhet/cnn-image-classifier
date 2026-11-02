@@ -37,11 +37,14 @@ def random_test_image() -> tuple[Image.Image, dict[str, float], str]:
     scores = classify(small)
     truth = CLASSES[test_labels[index]]
     verdict = "correct" if max(scores, key=scores.get) == truth else "wrong"
-    # Nearest-neighbour upscaling so the 32x32 image is visible without blurring.
-    return small.resize((256, 256), Image.NEAREST), scores, f"Test image #{index}. True label: **{truth}** ({verdict})"
+    return small, scores, f"Test image #{index}. True label: **{truth}** ({verdict})"
 
 
-with gr.Blocks(title="CIFAR-10 CNN") as demo:
+# Show images at their real size (32x32 for test images) instead of stretching them
+# to fill the box; large uploads are still scaled down to fit.
+CSS = "#image img { object-fit: scale-down !important; }"
+
+with gr.Blocks(title="CIFAR-10 CNN", css=CSS) as demo:
     gr.Markdown(
         "# CIFAR-10 CNN\n"
         f"A 1.1M-parameter CNN trained from scratch. Test accuracy: 91.6%. "
@@ -49,7 +52,7 @@ with gr.Blocks(title="CIFAR-10 CNN") as demo:
     )
     with gr.Row():
         with gr.Column():
-            image = gr.Image(type="pil", label="Image", height=300)
+            image = gr.Image(type="pil", label="Image", height=300, elem_id="image")
             with gr.Row():
                 random_button = gr.Button("Random test image", variant="primary")
                 classify_button = gr.Button("Classify")
