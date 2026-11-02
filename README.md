@@ -81,6 +81,14 @@ python -m cnn_classifier.predict my_cat.jpg
 It prints the top three classes with their probabilities. Images are resized to 32×32, so
 photos where the object fills most of the frame work best.
 
+Or try it in the browser: a small Gradio app lets you upload a photo or pull a random test
+image and compare the prediction with the true label.
+
+```bash
+pip install -e ".[demo]"
+python app.py   # then open http://localhost:7860
+```
+
 Run the tests:
 
 ```bash
@@ -99,6 +107,7 @@ src/cnn_classifier/
   train.py      training command
   evaluate.py   test-set metrics and figures
   predict.py    predictions on your own images
+app.py          browser demo (Gradio)
 tests/          model, data and training-loop checks
 results/        training history, metrics and log from the run above
 assets/         figures used in this README
