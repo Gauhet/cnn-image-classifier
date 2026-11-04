@@ -89,6 +89,8 @@ pip install -e ".[demo]"
 python app.py   # then open http://localhost:7860
 ```
 
+![The browser demo](assets/app.png)
+
 Run the tests:
 
 ```bash

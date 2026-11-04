@@ -8,6 +8,7 @@ import random
 from pathlib import Path
 
 import gradio as gr
+import numpy as np
 import torch
 from PIL import Image
 from torchvision import transforms
@@ -27,6 +28,9 @@ test_images, test_labels = load_split(ROOT / "data", "test")
 def classify(image: Image.Image | None) -> dict[str, float]:
     if image is None:
         return {}
+    pixels = np.asarray(image.convert("RGB"))
+    if pixels.shape[:2] == (256, 256) and (pixels == pixels[::8, ::8].repeat(8, 0).repeat(8, 1)).all():
+        image = Image.fromarray(pixels[::8, ::8])  # a test image shown 8x larger: use its original pixels
     probs = model(preprocess(image.convert("RGB")).unsqueeze(0).to(device)).softmax(dim=1).squeeze(0)
     return {name: p for name, p in zip(CLASSES, probs.tolist())}
 
@@ -37,11 +41,13 @@ def random_test_image() -> tuple[Image.Image, dict[str, float], str]:
     scores = classify(small)
     truth = CLASSES[test_labels[index]]
     verdict = "correct" if max(scores, key=scores.get) == truth else "wrong"
-    return small, scores, f"Test image #{index}. True label: **{truth}** ({verdict})"
+    # Shown 8x larger with hard pixel edges, so the 32x32 image the model sees is visible
+    # without being blurred.
+    shown = small.resize((256, 256), Image.NEAREST)
+    return shown, scores, f"Test image #{index}, 32x32 pixels shown 8x larger. True label: **{truth}** ({verdict})"
 
 
-# Show images at their real size (32x32 for test images) instead of stretching them
-# to fill the box; large uploads are still scaled down to fit.
+# Don't stretch images to fill the box; large uploads are still scaled down to fit.
 CSS = "#image img { object-fit: scale-down !important; }"
 
 with gr.Blocks(title="CIFAR-10 CNN", css=CSS) as demo:
